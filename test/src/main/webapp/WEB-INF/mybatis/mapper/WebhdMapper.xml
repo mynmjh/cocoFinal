@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="webhd">
+<!-- notice테이블에서 num의 최대값만 구한다 -->
+	
+	<select id="maxNum" resultType="Integer">
+		SELECT NVL(MAX(num),0) from webhard 
+	</select> 
+	
+	 
+	 <!-- 
+	 private int listNum, num, hitCount, s_num, fileNum, fileSize;
+	private String category, subject, content, saveFilename, originalFilename, created, name;
+	private long gap;
+	private List<MultipartFile> upload;
+	  -->
+	 
+	<insert id="insertWebhd" parameterType="com.sp.webhd.Webhd">
+		INSERT INTO webhard(num, s_num, subject, content, category) VALUES (#{num},#{s_num},#{subject},#{content},1)
+	</insert> 
+	
+		
+	<insert id="insertWebhdFile" parameterType="com.sp.webhd.Webhd">
+	INSERT INTO webhard_File(fileNum, num, s_num, saveFilename, originalFilename, fileSize) 
+					VALUES (webhard_File_seq.NEXTVAL,#{num},#{s_num},#{saveFilename},#{originalFilename},#{fileSize})
+	</insert>
+	
+	
+	
+	<sql id="where-list">
+		<if test="searchKey=='subject'">
+			INSTR(subject, #{searchValue}) &gt; 0
+		</if>
+		<if test="searchKey=='name'">
+			name=#{searchValue}
+		</if>
+		<if test="searchKey=='content'">
+			DBMS_LOB.INSTR(content,  #{searchValue})  &gt;  0
+		</if>
+		<if test="searchKey=='created'">
+			TO_CHAR(w.created,'YYYY-MM-DD')=#{searchValue}
+			OR TO_CHAR(w.created,'YYYYMMDD')=#{searchValue}
+		</if>
+	</sql>
+
+ 
+ 	
+	<select id="dataCount" parameterType="map" resultType="Integer">
+		select NVL(count(*),0) from webhard w join staff1 s on w.s_num=s.s_num
+		<where>
+			<if test="searchValue != null and searchValue != ''">
+				<include refid="where-list"/>
+			</if>
+	    </where>
+	</select>
+	
+	<!-- notice가 1인것만 가져온다. -->
+	<!-- 
+	<select id="listNoticeTop" resultType="com.sp.notice.Notice"> 
+				select num, n.s_num, name, subject, hitCount, notice
+                ,TO_CHAR(created, 'YYYY-MM-DD') created from notice n join member2 m on n.s_num=m.s_num where notice=1 
+                order by num desc
+	</select>
+	 -->
+	<!-- 걍 list 가져온다 -->
+	
+	<select id="listWebhd" resultType="com.sp.webhd.Webhd" parameterType="map"> 
+		select * from (
+			SELECT ROWNUM rnum, tb.* FROM(
+				select w.num, s.name,w.s_num,
+				w.created,
+				w.subject, w.hitCount	
+         		from webhard w join staff1 s on w.s_num=s.s_num
+         		<where>
+					<if test="searchValue != null and searchValue != ''">
+						<include refid="where-list"/>
+					</if>
+				</where>
+				ORDER BY num desc
+		<![CDATA[
+			) tb WHERE ROWNUM <= #{end}
+		)WHERE rnum >= #{start}
+	]]>
+	</select>
+	<!-- 
+	<select id="readNotice" parameterType="Integer" resultType="com.sp.notice.Notice">
+		select num, m.name, n.s_num, subject, content, hitCount, to_char(created, 'YYYY-MM-DD') 
+		created from notice n 
+		join member2 m on n.s_num = m.s_num where num= #{num}
+	</select>
+	
+	<select id="listFile" parameterType="Integer" resultType="com.sp.notice.Notice">
+		SELECT fileNum, num, saveFilename, originalFilename, fileSize FROM noticeFile WHERE num=#{num}
+	</select>
+	
+	<select id="readFile" parameterType="Integer" resultType="com.sp.notice.Notice">
+		SELECT fileNum, num, saveFilename, originalFilename, fileSize FROM noticeFile WHERE fileNum=#{fileNum}
+	</select>
+	
+	
+	<update id="updateNotice" 
+          parameterType="com.sp.notice.Notice">
+          UPDATE notice SET subject=#{subject},
+               content=#{content}, notice=#{notice}
+               WHERE num=#{num}
+    </update>
+    
+	<delete id="deleteNotice" parameterType="Integer">
+		DELETE FROM notice WHERE num=#{num}
+	</delete>
+	
+	<delete id="deleteFile" parameterType="map">
+	    DELETE FROM noticeFile WHERE ${field} = #{num}
+	</delete>
+	
+	
+	
+	<select id="nextReadNotice" resultType="com.sp.notice.Notice" parameterType="map">
+		select tb.* from(
+			select num, subject from notice
+				<where>
+					<if test="searchValue != null and searchValue != ''">
+						<include refid = "where-list"/>
+					</if>
+					<![CDATA[
+					  and (num > #{num})
+					]]>
+				</where>
+				ORDER BY num asc
+		)tb where rownum=1
+	</select>
+	
+	
+	<select id="preReadNotice" resultType="com.sp.notice.Notice" parameterType="map">
+		select tb.* from(
+			select num, subject from notice
+				<where>
+					<if test="searchValue != null and searchValue != ''">
+						<include refid = "where-list"/>
+					</if>
+					<![CDATA[
+					  and (num < #{num})
+					]]>
+				</where>
+				ORDER BY num desc
+		)tb where rownum=1
+	</select>
+	-->
+	
+	<update id="updateHitCount" parameterType="Integer">
+		update webhard set hitCount = hitCount+1 where num=#{num}
+	</update>
+	
+	  
+	
+	
+	
+</mapper>

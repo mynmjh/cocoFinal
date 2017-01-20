@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="notice">
+
+	<select id="maxNum" resultType="Integer">
+		select nvl(max(num), 0) from notice
+	</select>
+	
+	<insert id="insertNotice" parameterType="com.sp.notice.Notice">
+		insert into notice (num, s_num, notice, subject, content, hitCount)
+		values (notice_seq.NEXTVAL, #{s_num}, #{notice}, #{subject}, #{content}, #{hitCount})
+	</insert>
+	
+	<sql id="where-list">
+	  <if test="searchKey=='name'">
+	      name=#{searchValue}
+	  </if>
+	  <if test="searchKey=='subject'">
+	      INSTR(subject, #{searchValue}) &gt; 0
+	  </if>
+	  <if test="searchKey=='content'">
+	      DBMS_LOB.INSTR(content, #{searchValue}) &gt; 0 
+	  </if>
+	  <if test="searchKey=='created'">
+	      TO_CHAR(n.created, 'YYYY-MM-DD') = #{searchValue}
+	      OR TO_CHAR(n.created, 'YYYYMMDD') = #{searchValue}
+	  </if>
+	</sql>
+	
+	<select id="listNotice" parameterType="map" resultType="com.sp.notice.Notice">
+		select * from (
+  			select rownum rnum, tb.* from (
+    			select n.num, s1.s_num, s1.name, n.subject, n.notice, n.created, n.hitCount
+    			from notice n
+    			join staff1 s1 on n.s_num = s1.s_num
+    			join staff2 s2 on n.s_num = s2.s_num
+    			<where>
+                     <if test="searchValue != null and searchValue != '' ">
+			              <include refid="where-list"/>
+		             </if>
+	            </where>
+    			order by num desc
+    <![CDATA[
+  			) tb where rownum <= #{end}
+		) where rnum >= #{start}
+	]]>
+	</select>
+	
+	<select id="listNoticeTop" resultType="com.sp.notice.Notice">
+		select n.num, s1.s_num, s1.name, n.subject, n.notice, to_char(created, 'YYYY-MM-DD') created, n.hitCount
+		from notice n
+		join staff1 s1 ON n.s_num = s1.s_num
+		join staff2 s2 on n.s_num = s2.s_num
+		where notice = 1 order by num desc
+	</select>
+	
+	<select id="dataCount" parameterType="map" resultType="Integer">
+	  SELECT NVL(COUNT(*), 0) FROM notice n JOIN staff1 s ON n.s_num = s.s_num
+	  <where>
+	  	<if test="searchValue!=null and searchValue!='' ">
+	  		<include refid="where-list"/>
+	    </if>
+	  </where>   
+	</select>
+	
+	<select id="readNotice" resultType="com.sp.notice.Notice">
+		select n.num, s1.s_num, s1.name, n.subject, n.content, n.created, n.hitCount, n.notice
+		from notice n join staff1 s1 on n.s_num = s1.s_num where num = #{num}
+	</select>
+	
+	<update id="updateHitCount" parameterType="Integer">
+		update notice set hitCount = hitCount +1 where num = #{num}
+    </update>
+    
+    <select id="preReadNotice" resultType="com.sp.notice.Notice" parameterType="map">
+            select tb.* from (
+            	select num, subject from notice n join staff1 s on n.s_num = s.s_num
+	                <where>
+	                    <if test="searchValue != null and searchValue != '' ">
+	                        <include refid="where-list"/>
+	                    </if>
+	                    <![CDATA[
+	                        AND (num > #{num})
+	                    ]]>
+	                </where>
+                ORDER BY num ASC
+            ) tb WHERE ROWNUM=1
+    </select>
+    
+    <select id="nextReadNotice" resultType="com.sp.notice.Notice" parameterType="map">
+            select tb.* from (
+            	select num, subject from notice n join staff1 s on n.s_num = s.s_num
+                    <where>
+                         <if test="searchValue != null and searchValue != '' ">
+                              <include refid="where-list"/>
+                         </if>
+                       <![CDATA[
+                         AND (num < #{num})
+                         ]]>
+                    </where>
+                ORDER BY num DESC
+            ) tb WHERE ROWNUM=1
+    </select>
+
+
+</mapper>

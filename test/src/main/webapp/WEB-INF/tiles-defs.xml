@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+    <!-- 4 단 일반 -->
+	<definition name=".fourLayout" template="/WEB-INF/view/layout/layout2.jsp">
+	    <put-attribute name="title" value="spring" />
+	  	<put-attribute name="header" value="/WEB-INF/view/layout/header.jsp" />
+	  	<put-attribute name="left" value="/WEB-INF/view/menu1/left.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/main/main.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/view/layout/footer.jsp" />
+	</definition>
+	<definition name=".four.*.*.*" extends=".fourLayout">
+	  	<put-attribute name="left" value="/WEB-INF/view/{1}/left.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<definition name=".four.*.*" extends=".fourLayout">
+	  	<put-attribute name="left" value="/WEB-INF/view/{1}/left.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/{1}/{2}.jsp"/>
+	</definition>
+	<definition name=".four.*" extends=".fourLayout">
+	  	<put-attribute name="left" value="/WEB-INF/view/{1}/left.jsp" />
+   	    <put-attribute name="body" value="/WEB-INF/view/{1}.jsp" />
+	</definition>
+
+    <!-- 4 단 관리자 -->
+	<definition name=".admin4Layout" template="/WEB-INF/view/admin/layout/layout2.jsp">
+	    <put-attribute name="title" value="spring" />
+	  	<put-attribute name="header" value="/WEB-INF/view/admin/layout/header.jsp" />
+	  	<put-attribute name="left" value="/WEB-INF/view/admin/menu1/left.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/admin/main/main.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/view/admin/layout/footer.jsp" />
+	</definition>
+	<definition name=".admin4.*.*.*" extends=".admin4Layout">
+	  	<put-attribute name="left" value="/WEB-INF/view/admin/{1}/left.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/admin/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<definition name=".admin4.*.*" extends=".admin4Layout">
+	  	<put-attribute name="left" value="/WEB-INF/view/admin/{1}/left.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/admin/{1}/{2}.jsp"/>
+	</definition>
+	<definition name=".admin4.*" extends=".admin4Layout">
+	  	<put-attribute name="left" value="/WEB-INF/view/admin/{1}/left.jsp" />
+   	    <put-attribute name="body" value="/WEB-INF/view/admin/{1}.jsp" />
+	</definition>
+
+   <!-- 3단 관리자 -->
+	<definition name=".adminLayout" template="/WEB-INF/view/admin/layout/layout.jsp">
+	    <put-attribute name="title" value="spring" />
+	  	<put-attribute name="header" value="/WEB-INF/view/admin/layout/header.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/admin/main/main.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/view/layout/footer.jsp" />
+	</definition>
+	<definition name=".admin.*.*.*" extends=".adminLayout">
+		<put-attribute name="body" value="/WEB-INF/view/admin/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<definition name=".admin.*.*" extends=".adminLayout">
+		<put-attribute name="body" value="/WEB-INF/view/admin/{1}/{2}.jsp"/>
+	</definition>
+	<definition name=".admin.*" extends=".adminLayout">
+    	<put-attribute name="body" value="/WEB-INF/view/admin/{1}.jsp" />
+	</definition>
+
+  <!-- 순서가 바뀌면 안됨!!!!!! 얘는 모든것을 받을 수 있기 때문에 (* 많은것이 위에) -->
+   <!-- 3단 일반 -->
+	<definition name=".mainLayout" template="/WEB-INF/view/layout/layout.jsp"> <!--얘가 진짜 레이아웃  -->
+	    <put-attribute name="title" value="spring" />
+	  	<put-attribute name="header" value="/WEB-INF/view/layout/header.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/main/main.jsp" />
+		<put-attribute name="footer" value="/WEB-INF/view/layout/footer.jsp" />
+	</definition>
+	<!-- 순서가 바뀌면 안됨(* 많은것이 위에) -->
+	<definition name=".staff.login" template="/WEB-INF/view/staff/login.jsp">
+		<put-attribute name="body" value="/WEB-INF/view/staff/login.jsp" />
+	</definition>
+	<definition name=".*.*.*" extends=".mainLayout">
+		<put-attribute name="body" value="/WEB-INF/view/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<definition name=".*.*" extends=".mainLayout">
+		<put-attribute name="body" value="/WEB-INF/view/{1}/{2}.jsp"/> <!--가변적으로 들어옴   -->
+	</definition>
+	<definition name=".*" extends=".mainLayout">
+    	  <put-attribute name="body" value="/WEB-INF/view/{1}.jsp" />
+	</definition>
+
+</tiles-definitions>

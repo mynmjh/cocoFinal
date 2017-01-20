@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="talk">
+	
+	<insert id="insertTalk" parameterType="com.sp.talk.Talk">
+		Insert into todayTalk (num, s_num, content)
+		Values (todayTalk_seq.nextVal, #{s_num}, #{content})
+	</insert>
+	
+	<select id="listTalk" resultType="com.sp.talk.Talk">
+		Select t.num, s1.s_num, s1.name, content, To_char(created, 'YYYY-MM-DD') created
+		from todayTalk t
+		Join staff1 s1 on t.s_num = s1.s_num
+   		where to_Char(created, 'YYYY-MM-DD') = TO_CHAR(sysdate, 'YYYY-MM-DD')
+		order by num desc
+	</select>
+	
+	<select id="dataCount" resultType="Integer">
+		Select NVL(count(*),0) from todayTalk 
+		where to_Char(created, 'YYYY-MM-DD') = TO_CHAR(sysdate, 'YYYY-MM-DD')
+	</select>
+	
+ 	<delete id="deleteTalk" parameterType="Integer">
+		Delete from todayTalk 
+		Where num = #{num}
+	</delete> 
+	
+</mapper>

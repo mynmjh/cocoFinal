@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="staff">
+
+    <select id="readStaff" resultType="com.sp.staff.Staff" parameterType="Integer">
+    	select s1.s_num, s1.name, s1.password, s2.birth, s2.email, s2.tel, s2.addr1, s2.addr2,
+    			b.b_name, bl.b_code, bl.b_reason, bl.b_created, p.p_name, pl.p_code, pl.p_reason, pl.p_created, a.author
+    	from staff1 s1
+    	join staff2 s2 on s1.s_num = s2.s_num
+    	join buseo_log bl on s1.s_num = bl.s_num
+    	join buseo b on bl.b_code = b.b_code
+    	join position_log pl on s1.s_num = pl.s_num
+    	join position p on pl.p_code = p.p_code
+    	join authority a on s1.s_num = a.s_num
+    	where s1.s_num = #{s_num}
+    </select>
+
+</mapper>
